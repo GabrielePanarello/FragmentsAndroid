@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.gabrielepanarello.fragments.R;
 import com.example.gabrielepanarello.fragments.logic.Utils;
@@ -14,16 +15,13 @@ import com.example.gabrielepanarello.fragments.ui.fragments.PizzaFragment;
 import com.example.gabrielepanarello.fragments.ui.fragments.SelectedListener;
 
 public class MainActivity extends Activity implements SelectedListener {
-    int position = 0;
+    private int position = 0;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if(savedInstanceState != null){
-            savedInstanceState.getInt("pos",0);
-        }
 
         Utils.init();
 
@@ -31,6 +29,16 @@ public class MainActivity extends Activity implements SelectedListener {
         DetailFragment detailFragment = new DetailFragment();
 
         FragmentManager fragmentManager = getFragmentManager();
+
+        if(savedInstanceState != null){
+            position = savedInstanceState.getInt("posi",0);
+            bundle = savedInstanceState.getBundle("pos");
+
+            bundle.putString("detail", Utils.getPizzaList().get(position).getDescrizione());
+            bundle.putString("title", Utils.getPizzaList().get(position).getNome());
+
+            detailFragment.setArguments(bundle);
+        }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
@@ -74,7 +82,8 @@ public class MainActivity extends Activity implements SelectedListener {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("pos",this.position);
+        outState.putBundle("pos",this.bundle);
+        outState.putInt("posi",this.position);
         super.onSaveInstanceState(outState);
     }
 
@@ -82,7 +91,7 @@ public class MainActivity extends Activity implements SelectedListener {
         // Create new fragment and transaction
         this.position = position;
         DetailFragment detailFragment = new DetailFragment();
-        Bundle bundle = new Bundle();
+        bundle = new Bundle();
 
         bundle.putString("detail", Utils.getPizzaList().get(position).getDescrizione());
         bundle.putString("title", Utils.getPizzaList().get(position).getNome());
